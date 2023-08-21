@@ -11,14 +11,13 @@ export default () => {
   */
   let notFound = () => {};
 
-  const router = {};
-
   /* 
   현재 URL의 해시값과 일치하는 라우트를 'routes' 배열에서 찾는다
   만약 일치하는 라우트가 없으면 'notFound' 콜백 함수 실행
   일치하는 라우트 있다면 해당 라우트의 'component' 함수를 실행
   */
   const checkRoutes = () => {
+    console.log(window.location.hash);
     const currentRoute = routes.find((route) => {
       return route.fragment === window.location.hash;
     });
@@ -28,42 +27,44 @@ export default () => {
       return;
     }
 
+    /* pages.js에서 설정한 컴포넌트 함수 렌더링 */
     currentRoute.component();
   };
 
-  /* 
-  새로운 라우트를 routes 배열에 추가, 체이닝을 위해 router 객체를 반환
-   */
-  router.addRoute = (fragment, component) => {
-    routes.push({
-      fragment,
-      component,
-    });
+  const router = {
+    /* 
+    새로운 라우트를 routes 배열에 추가, 체이닝을 위해 router 객체를 반환
+     */
+    addRoute: (fragment, component) => {
+      routes.push({
+        fragment,
+        component,
+      });
 
-    return router;
-  };
+      return router;
+    },
 
-  /* 
-  noutFound 콜백을 설정
-   */
-  router.setNotFound = (cb) => {
-    notFound = cb;
-    return router;
-  };
+    /* 
+    noutFound 콜백을 설정
+     */
+    setNotFound: (cb) => {
+      notFound = cb;
+      return router;
+    },
 
-  /* 
-  라우팅을 시작하는 함수
-  hashchange 이벤트에 대한 리스너를 추가
-  현재의 해시값이 없다면 기본 해시값 설정한 후 checkRoutes 함수를 호출하여 현재 라우트를 체크
-  */
-  router.start = () => {
-    window.addEventListener("hashchange", checkRoutes);
+    /* 
+    라우팅을 시작하는 함수
+    hashchange 이벤트에 대한 리스너를 추가
+    현재의 해시값이 없다면 기본 해시값 설정한 후 checkRoutes 함수를 호출하여 현재 라우트를 체크
+    */
+    start: () => {
+      window.addEventListener("hashchange", checkRoutes);
+      if (!window.location.hash) {
+        window.location.hash = "#/";
+      }
 
-    if (!window.location.hash) {
-      window.location.hash = "#/";
-    }
-
-    checkRoutes();
+      checkRoutes();
+    },
   };
 
   /* 
